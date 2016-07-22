@@ -1,2 +1,6 @@
 hello.py
 venv
+*.pyc
+.DS_Store
+blog.db
+robots.txt

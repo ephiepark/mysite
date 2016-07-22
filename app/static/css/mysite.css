@@ -1,0 +1,29 @@
+.header {
+  height: 450px;
+  background-image: url("/static/img/Korean_Architecture.jpg");
+  background-size: cover;
+}
+
+.vertical-center {
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.header > .container {
+  position: relative;
+  left: 65.5%;
+}
+
+.font-playfair-display {
+  font-family: 'Playfair Display', serif;
+}
+
+.header h1 {
+  color: #37474f;
+  padding: 10px 0px 10px 0px;
+}
+
+.navbar-static-top {
+  /* background-color: #80cbc4; */
+}
