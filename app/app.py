@@ -4,6 +4,8 @@ import os
 import re
 import urllib
 
+import logging
+
 from flask import (Flask, flash, Markup, redirect, render_template, request,
                    Response, session, url_for)
 from markdown import markdown
@@ -40,6 +42,10 @@ SITE_WIDTH = 800
 # Create a Flask WSGI app and configure it using values from the module.
 app = Flask(__name__)
 app.config.from_object(__name__)
+
+# Set a logger
+stream_handler = logging.StreamHandler()
+app.logger.addHandler(stream_handler)
 
 # FlaskDB is a wrapper for a peewee database that sets up pre/post-request
 # hooks for managing database connections.
@@ -174,6 +180,7 @@ def logout():
 
 @app.route('/')
 def index():
+    app.logger.error("test log")
     search_query = request.args.get('q')
     if search_query:
         query = Entry.search(search_query)
