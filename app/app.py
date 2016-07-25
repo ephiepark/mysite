@@ -3,6 +3,7 @@ import functools
 import os
 import re
 import urllib
+import sys
 
 import logging
 
@@ -46,7 +47,7 @@ app = Flask(__name__)
 app.config.from_object(__name__)
 
 # Set a logger
-stream_handler = logging.StreamHandler()
+stream_handler = logging.StreamHandler(sys.stdout)
 app.logger.addHandler(stream_handler)
 
 # FlaskDB is a wrapper for a peewee database that sets up pre/post-request
