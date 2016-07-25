@@ -184,13 +184,13 @@ def logout():
 
 @app.route('/')
 def index():
-    app.logger.debug("test log")
+    app.logger.error("test log")
     search_query = request.args.get('q')
     if search_query:
         query = Entry.search(search_query)
     else:
         query = Entry.public().order_by(Entry.timestamp.desc())
-    app.logger.debug("Entry query done")
+    app.logger.error("Entry query done")
     # The `object_list` helper will take a base query and then handle
     # paginating the results if there are more than 20. For more info see
     # the docs:
