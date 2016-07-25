@@ -5,3 +5,4 @@ venv
 blog.db
 robots.txt
 log.txt
+logfile

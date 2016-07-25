@@ -15,7 +15,7 @@ from micawber import bootstrap_basic, parse_html
 from micawber.cache import Cache as OEmbedCache
 from peewee import *
 from playhouse.flask_utils import FlaskDB, get_object_or_404, object_list
-from playhouse.sqlite_ext import *
+# from playhouse.postgres_ext import *
 
 
 # Blog configuration values.
@@ -27,7 +27,9 @@ ADMIN_PASSWORD = 'secret'
 APP_DIR = os.path.dirname(os.path.realpath(__file__))
 
 # The playhouse.flask_utils.FlaskDB object accepts database URL configuration.
-DATABASE = 'sqliteext:///%s' % os.path.join(APP_DIR, 'blog.db')
+# DATABASE = 'sqliteext:///%s' % os.path.join(APP_DIR, 'blog.db')
+# DATABASE = 'postgresql://ephraimpark:password@localhost:5432/mysite_db'
+DATABASE = 'postgres://zrzwfdfydlrfwk:EuQ8L8atZROsm76p2c2BteaZY8@ec2-54-225-112-215.compute-1.amazonaws.com:5432/d2l7j9pr4it50u'
 DEBUG = False
 
 # The secret key is used internally by Flask to encrypt session data stored
@@ -92,22 +94,22 @@ class Entry(flask_db.Model):
         ret = super(Entry, self).save(*args, **kwargs)
 
         # Store search content.
-        self.update_search_index()
+        # self.update_search_index()
         return ret
 
-    def update_search_index(self):
+    # def update_search_index(self):
         # Create a row in the FTSEntry table with the post content. This will
         # allow us to use SQLite's awesome full-text search extension to
         # search our entries.
-        try:
-            fts_entry = FTSEntry.get(FTSEntry.entry_id == self.id)
-        except FTSEntry.DoesNotExist:
-            fts_entry = FTSEntry(entry_id=self.id)
-            force_insert = True
-        else:
-            force_insert = False
-        fts_entry.content = '\n'.join((self.title, self.content))
-        fts_entry.save(force_insert=force_insert)
+    #     try:
+    #         fts_entry = FTSEntry.get(FTSEntry.entry_id == self.id)
+    #     except FTSEntry.DoesNotExist:
+    #         fts_entry = FTSEntry(entry_id=self.id)
+    #         force_insert = True
+    #     else:
+    #         force_insert = False
+    #     fts_entry.content = '\n'.join((self.title, self.content))
+    #     fts_entry.save(force_insert=force_insert)
 
     @classmethod
     def public(cls):
@@ -129,23 +131,24 @@ class Entry(flask_db.Model):
         # Query the full-text search index for entries matching the given
         # search query, then join the actual Entry data on the matching
         # search result.
-        return (FTSEntry
-                .select(
-                    FTSEntry,
-                    Entry,
-                    FTSEntry.rank().alias('score'))
-                .join(Entry, on=(FTSEntry.entry_id == Entry.id).alias('entry'))
-                .where(
-                    (Entry.published == True) &
-                    (FTSEntry.match(search)))
-                .order_by(SQL('score').desc()))
+        return Entry.select().where(Entry.published == True)
+                # (FTSEntry
+                # .select(
+                #     FTSEntry,
+                #     Entry,
+                #     FTSEntry.rank().alias('score'))
+                # .join(Entry, on=(FTSEntry.entry_id == Entry.id).alias('entry'))
+                # .where(
+                #     (Entry.published == True) &
+                #     (FTSEntry.match(search)))
+                # .order_by(SQL('score').desc()))
 
-class FTSEntry(FTSModel):
-    entry_id = IntegerField(Entry)
-    content = TextField()
-
-    class Meta:
-        database = database
+# class FTSEntry(FTSModel):
+#     entry_id = IntegerField(Entry)
+#     content = TextField()
+#
+#     class Meta:
+#         database = database
 
 def login_required(fn):
     @functools.wraps(fn)
@@ -269,7 +272,8 @@ def not_found(exc):
     return Response('<h3>Not found</h3>'), 404
 
 def main():
-    database.create_tables([Entry, FTSEntry], safe=True)
+    # database.create_tables([Entry, FTSEntry], safe=True)
+    database.create_tables([Entry], safe=True)
     app.run(debug=True)
 
 if __name__ == '__main__':
