@@ -252,7 +252,6 @@ def not_found(exc):
 
 def main():
   # database.create_tables([Entry, FTSEntry], safe=True)
-  print app.config
   database.create_tables([Entry], safe=True)
   app.run(debug=True)
 
