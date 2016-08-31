@@ -1,6 +1,8 @@
 import datetime
 import re
 
+from urlparse import urlparse
+
 from flask import Markup
 from flask import current_app as app
 from markdown import markdown
@@ -11,9 +13,11 @@ from micawber.cache import Cache as OEmbedCache
 
 from peewee import *
 from playhouse.flask_utils import FlaskDB
-
+from playhouse.postgres_ext import *
 
 flask_db = FlaskDB()
+
+# flask_db = FlaskDB()
 
 # Configure micawber with the default OEmbed providers (YouTube, Flickr, etc).
 # We'll use a simple in-memory cache so that multiple requests for the same
@@ -26,6 +30,7 @@ class Entry(flask_db.Model):
   content = TextField()
   published = BooleanField(index=True)
   timestamp = DateTimeField(default=datetime.datetime.now, index=True)
+  search_content = TSVectorField()
 
   @property
   def html_content(self):
@@ -48,25 +53,15 @@ class Entry(flask_db.Model):
     # Generate a URL-friendly representation of the entry's title.
     if not self.slug:
       self.slug = re.sub('[^\w]+', '-', self.title.lower()).strip('-')
-    ret = super(Entry, self).save(*args, **kwargs)
 
     # Store search content.
-    # self.update_search_index()
+    self.update_search_index()
+
+    ret = super(Entry, self).save(*args, **kwargs)
     return ret
 
-  # def update_search_index(self):
-    # Create a row in the FTSEntry table with the post content. This will
-    # allow us to use SQLite's awesome full-text search extension to
-    # search our entries.
-  #     try:
-  #         fts_entry = FTSEntry.get(FTSEntry.entry_id == self.id)
-  #     except FTSEntry.DoesNotExist:
-  #         fts_entry = FTSEntry(entry_id=self.id)
-  #         force_insert = True
-  #     else:
-  #         force_insert = False
-  #     fts_entry.content = '\n'.join((self.title, self.content))
-  #     fts_entry.save(force_insert=force_insert)
+  def update_search_index(self):
+    self.search_content = fn.to_tsvector(self.content)
 
   @classmethod
   def public(cls):
@@ -88,23 +83,8 @@ class Entry(flask_db.Model):
     # Query the full-text search index for entries matching the given
     # search query, then join the actual Entry data on the matching
     # search result.
-    return Entry.select().where(Entry.published == True)
-    # (FTSEntry
-    # .select(
-    #     FTSEntry,
-    #     Entry,
-    #     FTSEntry.rank().alias('score'))
-    # .join(Entry, on=(FTSEntry.entry_id == Entry.id).alias('entry'))
-    # .where(
-    #     (Entry.published == True) &
-    #     (FTSEntry.match(search)))
-    # .order_by(SQL('score').desc()))
-
-# class FTSEntry(FTSModel):
-#     entry_id = IntegerField(Entry)
-#     content = TextField()
-#
-#     class Meta:
-#         database = database
+    return Entry.select().where(
+        (Entry.published == True) &
+        (Entry.search_content.match(search))) # | Match(Entry.title, search)))
 
 

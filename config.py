@@ -30,7 +30,7 @@ class Config(object):
 class ProductionConfig(Config):
   DEBUG = False
 
-  DATABASE = 'postgres://zrzwfdfydlrfwk:EuQ8L8atZROsm76p2c2BteaZY8@ec2-54-225-112-215.compute-1.amazonaws.com:5432/d2l7j9pr4it50u'
+  DATABASE = 'postgresext://zrzwfdfydlrfwk:EuQ8L8atZROsm76p2c2BteaZY8@ec2-54-225-112-215.compute-1.amazonaws.com:5432/d2l7j9pr4it50u'
 
 
 class StagingConfig(Config):
