@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Upload photo{% endblock %}
+
+{% block content_title %}Upload photo{% endblock %}
+
+{% block content %}
+  <div id="upload-container">
+    <div class="photo-upload">
+      <form method='POST' enctype='multipart/form-data' action="{{ url_for('upload') }}">
+        <div class="form-group">
+          <input type='file' name='photo' multiple>
+        </div>
+        <button type='submit' class="btn btn-default">Upload</button>
+      </form>
+    </div>
+    <div class="photo-list">
+      {% for photo in photo_list %}
+        <div class="img-container">
+          <img src="{{ url_for('static', filename=photo) }}" class="img-rounded img-responsive" />
+        </div>    
+      {% else %}
+        <p>No photos have been uploaded yet.</p>
+      {% endfor %}
+      <div class="clear"></div>
+    </div>
+  </div>
+{% endblock %}

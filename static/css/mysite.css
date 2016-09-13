@@ -1,13 +1,32 @@
-.header {
-  height: 450px;
-  background-image: url("/static/img/Korean_Architecture.jpg");
-  background-size: cover;
-}
-
+/* General */
 .vertical-center {
   position: relative;
   top: 50%;
   transform: translateY(-50%);
+}
+
+.font-playfair-display {
+  font-family: 'Playfair Display', serif;
+}
+
+.clear {
+  /* cancels float */
+  clear: both;
+}
+
+.img-container {
+  width: 250px;
+  height: 300px;
+  margin: 10px 10px 0px 0px;
+  padding: 10px;
+  float: left;
+}
+
+/* Background image setting */
+.header {
+  height: 450px;
+  background-image: url("/static/img/Korean_Architecture.jpg");
+  background-size: cover;
 }
 
 .header > .container {
@@ -15,15 +34,33 @@
   left: 65.5%;
 }
 
-.font-playfair-display {
-  font-family: 'Playfair Display', serif;
-}
-
 .header h1 {
   color: #37474f;
   padding: 10px 0px 10px 0px;
 }
 
-.navbar-static-top {
-  /* background-color: #80cbc4; */
+/* CSS regarding upload/ page */
+#upload-container .photo-list {
+  margin: 10px;
+}
+
+#upload-container .photo-list img {
+  width: 100%;
+}
+
+/* CSS regarding edit/ page */
+#edit-container .photo-list-container {
+  float: right;
+  width: 25%;
+  height: 505px;
+}
+
+#edit-container .photo-list {
+  height: 490px;
+  overflow: scroll;
+}
+
+#edit-container form {
+  float: left;
+  width: 70%;
 }

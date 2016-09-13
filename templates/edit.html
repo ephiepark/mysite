@@ -5,33 +5,54 @@
 {% block content_title %}Edit entry{% endblock %}
 
 {% block content %}
-  <form action="{{ url_for('edit', slug=entry.slug) }}" class="form-horizontal" method="post">
-    <div class="form-group">
-      <label for="title" class="col-sm-2 control-label">Title</label>
-      <div class="col-sm-10">
-        <input class="form-control" id="title" name="title" type="text" value="{{ request.form.get('title', entry.title) }}">
-      </div>
-    </div>
-    <div class="form-group">
-      <label for="Content" class="col-sm-2 control-label">Content</label>
-      <div class="col-sm-10">
-        <textarea class="form-control" id="content" name="content" style="height: 300px;">{{ request.form.get('content', entry.content) }}</textarea>
-      </div>
-    </div>
-    <div class="form-group">
-      <div class="col-sm-offset-2 col-sm-10">
-        <div class="checkbox">
-          <label>
-            <input {% if entry.published %}checked="checked" {% endif %}name="published" type="checkbox" value="y"> Published?
-          </label>
+  <div id="edit-container">
+    <form action="{{ url_for('edit', slug=entry.slug) }}" class="form-horizontal" method="post">
+      <div class="form-group">
+        <label for="title" class="col-sm-2 control-label">Title</label>
+        <div class="col-sm-10">
+          <input class="form-control" id="title" name="title" type="text" value="{{ request.form.get('title', entry.title) }}">
         </div>
       </div>
-    </div>
-    <div class="form-group">
-      <div class="col-sm-offset-2 col-sm-10">
-        <button class="btn btn-primary" type="submit">Save</button>
-        <a class="btn btn-default" href="{{ url_for('index') }}">Cancel</a>
+      <div class="form-group">
+        <label for="Content" class="col-sm-2 control-label">Content</label>
+        <div class="col-sm-10">
+          <textarea class="form-control" id="content" name="content" style="height: 300px;">{{ request.form.get('content', entry.content) }}</textarea>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+          <div class="checkbox">
+            <label>
+              <input {% if entry.published %}checked="checked" {% endif %}name="published" type="checkbox" value="y"> Published?
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+          <button class="btn btn-primary" type="submit">Save</button>
+          <a class="btn btn-default" href="{{ url_for('index') }}">Cancel</a>
+        </div>
+      </div>
+    </form> 
+    <div class="photo-list-container"> 
+      <h5>Photos</h5>
+      <div class="photo-list">
+        {% for photo in photo_list %}
+          <div class="img-container">
+            <img src="{{ url_for('static', filename=photo) }}" class="img-rounded img-responsive" /> 
+          </div> 
+        {% endfor %}
       </div>
     </div>
-  </form>
+    <div class="clear"></div>
+  </div>
+  <script>
+    $(".img-container img").click(function() {
+      var image_url = $(this).attr("src");
+      var markdown = "![Image]\n(" + image_url + ")";
+      // ![Image of Yaktocat](https://octodex.github.com/images/yaktocat.png)
+      addTextToCursor($("#content"), markdown);
+    });
+  </script>
 {% endblock %}

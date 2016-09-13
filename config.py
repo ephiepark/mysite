@@ -26,6 +26,10 @@ class Config(object):
   # The playhouse.flask_utils.FlaskDB object accepts database URL configuration.
   DATABASE = 'sqliteext:///%s' % os.path.join(APP_DIR, 'blog.db')
 
+  # Upload config
+  UPLOADED_PHOTOS_DEST = 'static/upload/img/'
+
+
 
 class ProductionConfig(Config):
   DEBUG = False

@@ -9,6 +9,8 @@ import logging
 
 from flask import (Flask, flash, redirect, render_template, request,
                    Response, session, url_for)
+from flask.ext.uploads import (UploadSet, IMAGES, configure_uploads)
+
 from playhouse.flask_utils import FlaskDB, get_object_or_404, object_list
 # from playhouse.postgres_ext import *
 
@@ -30,6 +32,10 @@ flask_db.init_app(app)
 # the wrapper.
 database = flask_db.database
 
+# Image upload flask extention
+photos = UploadSet('photos', IMAGES)
+configure_uploads(app, (photos))
+
 def login_required(fn):
   @functools.wraps(fn)
   def inner(*args, **kwargs):
@@ -37,6 +43,11 @@ def login_required(fn):
       return fn(*args, **kwargs)
     return redirect(url_for('login', next=request.path))
   return inner
+
+def get_upload_photo_list():
+  photo_list = os.listdir(app.config['UPLOADED_PHOTOS_DEST'])
+  upload_img_path = app.config['UPLOADED_PHOTOS_DEST'].split('/', 1)[1]
+  return map(lambda x: upload_img_path + x, photo_list)
 
 @app.route('/login/', methods=['GET', 'POST'])
 def login():
@@ -77,6 +88,19 @@ def index():
     query=query,
     search=search_query,
     check_bounds=False)
+
+@app.route('/upload/', methods=['GET', 'POST'])
+@login_required
+def upload():
+  if request.method == 'POST' and 'photo' in request.files:
+    photo_list = request.files.getlist('photo')
+    for photo in photo_list:
+      filename = photos.save(photo)
+    flash("{0} Photo saved.".format(len(photo_list)))
+    return redirect(url_for('upload'))
+
+  photo_list = get_upload_photo_list()
+  return render_template('upload.html', photo_list=photo_list)
 
 @app.route('/create/', methods=['GET', 'POST'])
 @login_required
@@ -130,7 +154,8 @@ def edit(slug):
     else:
       flash('Title and Content are required.', 'danger')
 
-  return render_template('edit.html', entry=entry)
+  photo_list = get_upload_photo_list()
+  return render_template('edit.html', entry=entry, photo_list=photo_list)
 
 @app.template_filter('clean_querystring')
 def clean_querystring(request_args, *keys_to_remove, **new_values):
